@@ -66,16 +66,17 @@ const images = [
 
 const newGallery = document.querySelector(".gallery");
 
-function CreateGallery(arr) {
+function createGallery(arr) {
   return arr
     .map(({ preview, original, description }) => {
-      return `<li class="gallery-item">
-        <a class="gallery-link" href=${original}>
+      return `
+      <li class="gallery-item">
+        <a class="gallery-link" href="${original}">
           <img
             class="gallery-image"
-            src=${preview}
-            data-source=${original}
-            alt=${description}
+            src="${preview}"
+            data-source="${original}"
+            alt="${description}"
           />
         </a>
       </li>`;
@@ -83,22 +84,32 @@ function CreateGallery(arr) {
     .join("");
 }
 
-function ImageHandler(evt) {
+function imageHandler(evt) {
   evt.preventDefault();
-  if (evt.currentTarget === evt.target) {
-    return;
-  }
 
   const img = evt.target.closest(".gallery-image");
+  if (!img) return;
+
   const currentDataset = img.dataset.source;
+  const altText = img.alt;
+
   const instance = basicLightbox.create(`
     <div>
-    <img class="modal-img" src=${currentDataset} alt="">
+      <img class="modal-img" src="${currentDataset}" alt="${altText}">
     </div>
   `);
 
   instance.show();
+
+  const escHandler = (e) => {
+    if (e.key === "Escape") {
+      instance.close();
+      document.removeEventListener("keydown", escHandler);
+    }
+  };
+
+  document.addEventListener("keydown", escHandler);
 }
 
-newGallery.insertAdjacentHTML("beforeend", CreateGallery(images));
-newGallery.addEventListener("click", ImageHandler);
+newGallery.insertAdjacentHTML("beforeend", createGallery(images));
+newGallery.addEventListener("click", imageHandler);
